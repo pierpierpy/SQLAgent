@@ -1,0 +1,43 @@
+version: 1
+formatters:
+  detailedFormatter:
+    format: "%(asctime)s loglevel=%(levelname)-6s logger=%(name)s %(funcName)s() L%(lineno)-4d %(message)s   call_trace=%(pathname)s L%(lineno)-4d"
+  detailedFormatterAzure:
+    format: "loglevel=%(levelname)-6s logger=%(name)s %(funcName)s() L%(lineno)-4d %(message)s   call_trace=%(pathname)s L%(lineno)-4d"
+
+handlers:
+  consoleHandler:
+    class: logging.StreamHandler
+    formatter: detailedFormatter
+    stream: ext://sys.stdout
+
+  fileHandler:
+    class: logging.FileHandler
+    filename: log.log  
+    formatter: detailedFormatter
+
+  azureHandler:
+    class: opencensus.ext.azure.log_exporter.AzureLogHandler
+    connection_string: 
+    formatter: detailedFormatterAzure
+    level: INFO
+    
+loggers:
+    development:
+        level: INFO
+        handlers: [azureHandler,consoleHandler]
+        propagate: no
+
+    staging:
+        level: INFO
+        handlers: [consoleHandler]
+        propagate: no
+
+    production:
+        level: WARNING
+        handlers: [consoleHandler]
+        propagate: no
+
+root:
+  level: INFO
+  handlers: [consoleHandler, azureHandler]
